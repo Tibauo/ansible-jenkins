@@ -1,0 +1,88 @@
+---
+# tasks file for jenkins-install
+- name: Add Jenkins repo
+  become: yes
+  get_url:
+    url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
+    dest: /etc/yum.repos.d/jenkins.repo
+
+- name: Add jenkins repo key
+  become: yes
+  rpm_key:
+    state: present
+    key: https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+
+- name: Install jenkins
+  become: yes
+  package:
+    name: jenkins
+    state: present
+
+- name: Create groovy directory
+  become: yes
+  file:
+    path: "/var/lib/jenkins/init.groovy.d/"
+    state: directory
+    owner: jenkins
+    group: jenkins
+
+- name:
+  become: yes
+  template:
+    src: basic-security.groovy.j2
+    dest: /var/lib/jenkins/init.groovy.d/basic-security.groovy
+    owner: jenkins
+    group: jenkins
+
+- name: Configure Init file
+  become: yes
+  lineinfile:
+    dest: /etc/sysconfig/jenkins
+    insertafter: '^JENKINS_ARGS'
+    line: 'JENKINS_ARGS="$JENKINS_ARGS --prefix="'
+    state: present
+    
+- name: Configure Init file
+  become: yes
+  lineinfile:
+    dest: /etc/sysconfig/jenkins
+    insertafter: '^JENKINS_JAVA_OPTIONS'
+    line: 'JENKINS_JAVA_OPTIONS="$JENKINS_JAVA_OPTIONS -Djenkins.install.runSetupWizard=false"'
+    state: present
+
+- name: Start Jenkins
+  become: yes
+  systemd:
+    name: jenkins
+    state: started
+
+- name: Create update directory
+  become: yes
+  file:
+    path: "/var/lib/jenkins/updates"
+    state: directory
+    owner: jenkins
+    group: jenkins
+
+- name: Create update directory
+  become: yes
+  file:
+    path: "/var/lib/jenkins/plugins"
+    state: directory
+    owner: jenkins
+    group: jenkins
+
+- name: Download current plugin updates from Jenkins update site
+  become: yes
+  get_url:
+    url: "http://updates.jenkins-ci.org/latest/{{ item }}.hpi"
+    dest: /var/lib/jenkins/plugins
+    owner: jenkins
+    group: jenkins
+  with_items: "{{ jenkins_plugins }}"
+
+- name: Start Jenkins
+  become: yes
+  systemd:
+    name: jenkins
+    state: restarted

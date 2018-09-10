@@ -1,0 +1,27 @@
+---
+# defaults file for jenkins-install
+jenkins_admin_user: user
+jenkins_admin_password: user-password
+
+# list des plugins
+# http://updates.jenkins-ci.org/latest/
+jenkins_plugins:
+  - greenballs
+  - git
+  - git-client
+  - workflow-scm-step
+  - ansible
+  - workflow-step-api
+  - credentials
+  - apache-httpcomponents-client-4-api
+  - jsch
+  - ssh-credentials
+  - structs
+  - plain-credentials
+  - scm-api
+  - matrix-project
+  - mailer
+  - display-url-api
+  - junit
+  - script-security
+  - workflow-api
