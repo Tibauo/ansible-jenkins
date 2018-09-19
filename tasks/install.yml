@@ -18,6 +18,12 @@
     name: jenkins
     state: present
 
+- name: Install lmxl et pyton jenkins
+  become: yes
+  pip:
+    name: "{{ item }}"
+  with_items: "{{ pip_package }}"
+
 - name: Create groovy directory
   become: yes
   file:
@@ -26,11 +32,27 @@
     owner: jenkins
     group: jenkins
 
-- name:
+- name: Create admin
   become: yes
   template:
     src: basic-security.groovy.j2
     dest: /var/lib/jenkins/init.groovy.d/basic-security.groovy
+    owner: jenkins
+    group: jenkins
+
+- name: CSRF security
+  become: yes
+  template:
+    src: csrf.groovy.j2
+    dest: /var/lib/jenkins/init.groovy.d/csrf.groovy
+    owner: jenkins
+    group: jenkins
+
+- name: git config
+  become: yes
+  template:
+    src: gitconfig.j2
+    dest: /var/lib/jenkins/hudson.plugins.git.GitSCM.xml
     owner: jenkins
     group: jenkins
 
@@ -39,7 +61,7 @@
   lineinfile:
     dest: /etc/sysconfig/jenkins
     insertafter: '^JENKINS_ARGS'
-    line: 'JENKINS_ARGS="$JENKINS_ARGS --prefix="'
+    line: 'JENKINS_ARGS="$JENKINS_ARGS --prefix=/"'
     state: present
     
 - name: Configure Init file
@@ -81,8 +103,54 @@
     group: jenkins
   with_items: "{{ jenkins_plugins }}"
 
-- name: Start Jenkins
+- name: crumb
+  uri:
+    url: 'http://localhost:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)'
+    user: user
+    password: user-password
+    force_basic_auth: yes
+    return_content: yes
+  register: crumb
+
+- name: restart Jenkins
   become: yes
   systemd:
     name: jenkins
     state: restarted
+
+- name: wait Jenkins
+  uri:
+    url: "http://127.0.0.1:8080/login?from=%2F"
+    return_content: yes
+  register: result
+  until: result.status == 200
+  retries: 60
+  delay: 1
+
+- name: Get jenkins cli
+  get_url:
+    url: http://localhost:8080/jnlpJars/jenkins-cli.jar
+    dest: /tmp
+
+- name: Set global password
+  uri:
+    method: POST
+    url: 'http://127.0.0.1:8080/credentials/store/system/domain/_/createCredentials'
+    user: user
+    password: user-password
+    force_basic_auth: yes
+    headers:
+      Jenkins-Crumb: "{{ crumb.content.split(':')[1] }}"
+    body: |
+      json={
+        "": "0",
+        "credentials": {
+          "scope": "GLOBAL",
+          "id": "{{ scm_user }}",
+          "username": "{{ scm_user }}",
+          "password": "{{ scm_password }}",
+          "description": "My new credentials",
+          "$class": "com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl"
+        }
+      }
+    status_code: 302

@@ -6,22 +6,96 @@ jenkins_admin_password: user-password
 # list des plugins
 # http://updates.jenkins-ci.org/latest/
 jenkins_plugins:
-  - greenballs
-  - git
-  - git-client
-  - workflow-scm-step
-  - ansible
-  - workflow-step-api
-  - credentials
-  - apache-httpcomponents-client-4-api
-  - jsch
-  - ssh-credentials
-  - structs
-  - plain-credentials
-  - scm-api
-  - matrix-project
-  - mailer
-  - display-url-api
-  - junit
-  - script-security
+  - build-timeout
+  - subversion
+  - pipeline-milestone-step
+  - email-ext
+  - pipeline-model-api
+  - windows-slaves
+  - bouncycastle-api
   - workflow-api
+  - jquery-detached
+  - javadoc
+  - jsch
+  - workflow-aggregator
+  - credentials-binding
+  - pipeline-rest-api
+  - run-condition
+  - resource-disposer
+  - pipeline-model-extensions
+  - scm-api
+  - structs
+  - momentjs
+  - parameterized-trigger
+  - display-url-api
+  - durable-task
+  - github-branch-source
+  - pipeline-stage-tags-metadata
+  - pipeline-input-step
+  - ant
+  - credentials
+  - ace-editor
+  - jquery
+  - external-monitor-job
+  - pam-auth
+  - handlebars
+  - pipeline-stage-step
+  - workflow-multibranch
+  - git-client
+  - pipeline-graph-analysis
+  - git-server
+  - matrix-project
+  - docker-commons
+  - workflow-durable-task-step
+  - mailer
+  - token-macro
+  - ldap
+  - pipeline-build-step
+  - script-security
+  - mapdb-api
+  - workflow-step-api
+  - build-pipeline-plugin
+  - conditional-buildstep
+  - junit
+  - maven-plugin
+  - ssh-credentials
+  - delivery-pipeline-plugin
+  - pipeline-model-declarative-agent
+  - workflow-scm-step
+  - pipeline-model-definition
+  - workflow-cps-global-lib
+  - plain-credentials
+  - matrix-auth
+  - cloudbees-folder
+  - pipeline-github-lib
+  - credentials
+  - workflow-basic-steps
+  - antisamy-markup-formatter
+  - gradle
+  - workflow-support
+  - branch-api
+  - jackson2-api
+  - git
+  - docker-workflow
+  - github
+  - timestamper
+  - workflow-job
+  - ssh-slaves
+  - pipeline-stage-view
+  - workflow-cps
+  - ansible
+  - ws-cleanup
+  - apache-httpcomponents-client-4-api
+  - authentication-tokens
+  - github-api
+  - greenballs
+
+scm_user: user
+scm_password: user-password
+scm_trigger: 'H/5 * * * *'
+scm_branch_check: '*/master'
+scm_project_url: http://gitlab/user/demo.git
+
+global_credential_id: user
+global_config_name: user
+global_config_mail: user@demo.local

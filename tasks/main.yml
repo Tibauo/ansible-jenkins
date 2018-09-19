@@ -13,3 +13,6 @@
 - name: Include install
   include_tasks: install.yml
   when: jenkins is defined 
+
+- name: Include install
+  include_tasks: create_pipeline.yml

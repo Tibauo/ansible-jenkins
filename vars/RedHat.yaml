@@ -1,5 +1,8 @@
-gitlab_repository_installation_script_url: "https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.rpm.sh"
-
 package_required:
   - epel-release
   - java-1.8.0-openjdk
+  - python-pip
+
+pip_package:
+  - lxml
+  - python-jenkins
