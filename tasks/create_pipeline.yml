@@ -6,7 +6,7 @@
     user: "{{ jenkins_admin_user }}"
     password: "{{ jenkins_admin_password }}"
     force_basic_auth: yes
-    url: "http://127.0.0.1:8080/crumbIssuer/api/json"
+    url: "{{ jenkins_address }}/crumbIssuer/api/json"
     return_content: yes
     status_code: 200, 404
   register: jenkins_crumb
@@ -19,7 +19,7 @@
   jenkins_job:
     config: "{{ lookup('template', 'templates/test.xml.j2') }}"
     name: test
-    url: http://localhost:8080
+    url: "{{ jenkins_address }}"
     user: "{{ jenkins_admin_user }}"
     password: "{{ jenkins_admin_password }}"
 
@@ -27,6 +27,6 @@
   jenkins_job:
     config: "{{ lookup('template', 'templates/package.xml.j2') }}"
     name: package
-    url: http://localhost:8080
+    url: "{{ jenkins_address }}"
     user: "{{ jenkins_admin_user }}"
     password: "{{ jenkins_admin_password }}"

@@ -63,7 +63,15 @@
     insertafter: '^JENKINS_ARGS'
     line: 'JENKINS_ARGS="$JENKINS_ARGS --prefix=/"'
     state: present
-    
+
+- name: Configure Port
+  become: yes
+  lineinfile:
+    dest: /etc/sysconfig/jenkins
+    regexp: '^JENKINS_PORT='
+    line: 'JENKINS_PORT="{{ jenkins_port }}"'
+    state: present
+
 - name: Configure Init file
   become: yes
   lineinfile:
@@ -94,18 +102,18 @@
     owner: jenkins
     group: jenkins
 
-- name: Download current plugin updates from Jenkins update site
-  become: yes
-  get_url:
-    url: "http://updates.jenkins-ci.org/latest/{{ item }}.hpi"
-    dest: /var/lib/jenkins/plugins
-    owner: jenkins
-    group: jenkins
-  with_items: "{{ jenkins_plugins }}"
-
+#- name: Download current plugin updates from Jenkins update site
+#  become: yes
+#  get_url:
+#    url: "http://updates.jenkins-ci.org/latest/{{ item }}.hpi"
+#    dest: /var/lib/jenkins/plugins
+#    owner: jenkins
+#    group: jenkins
+#  with_items: "{{ jenkins_plugins }}"
+#
 - name: crumb
   uri:
-    url: 'http://localhost:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)'
+    url: '{{ jenkins_address }}/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)'
     user: user
     password: user-password
     force_basic_auth: yes
@@ -120,22 +128,17 @@
 
 - name: wait Jenkins
   uri:
-    url: "http://127.0.0.1:8080/login?from=%2F"
+    url: "{{ jenkins_address }}/login?from=%2F"
     return_content: yes
   register: result
   until: result.status == 200
   retries: 60
   delay: 1
 
-- name: Get jenkins cli
-  get_url:
-    url: http://localhost:8080/jnlpJars/jenkins-cli.jar
-    dest: /tmp
-
 - name: Set global password
   uri:
     method: POST
-    url: 'http://127.0.0.1:8080/credentials/store/system/domain/_/createCredentials'
+    url: '{{ jenkins_address }}/credentials/store/system/domain/_/createCredentials'
     user: user
     password: user-password
     force_basic_auth: yes

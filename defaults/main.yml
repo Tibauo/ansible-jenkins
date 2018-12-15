@@ -3,6 +3,9 @@
 jenkins_admin_user: user
 jenkins_admin_password: user-password
 
+jenkins_port: 8090
+jenkins_address: "http://localhost:{{ jenkins_port }}"
+
 # list des plugins
 # http://updates.jenkins-ci.org/latest/
 jenkins_plugins:
